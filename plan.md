@@ -19,7 +19,7 @@ Build a full-featured HRIS REST API from scratch using .NET Core with layered ar
 - **API Validation** - FluentValidation for request validation
 - **Error Handling** - Global exception handling, proper HTTP status codes
 - **Database** - SQL Server Express with EF Core migrations and seed data
-- **Testing** - xUnit unit tests for services, integration tests with TestServer
+- **Testing** - PeopleCore.Tests project (to be implemented later)
 
 ---
 
@@ -55,7 +55,7 @@ people-core/
 |       |   +-- Middleware/       # Exception handling, auth
 |       |   +-- Program.cs        # Dependency injection, pipeline
 |       |   +-- appsettings.json  # Configuration
-|       +-- PeopleCore.Tests/     # xUnit tests
+|       +-- PeopleCore.Tests/     # xUnit tests (to be implemented later)
 |           +-- Unit/             # Service tests
 |           +-- Integration/      # Controller + DB tests
 +-- frontend/               [Frontend app - not yet implemented]
@@ -71,7 +71,7 @@ people-core/
 | Database              | SQL Server Express + EF Core                    |
 | Authentication        | JWT Bearer tokens + ASP.NET Identity            |
 | Validation            | FluentValidation                                |
-| Testing               | xUnit + Moq + TestServer                        |
+| Testing               | xUnit + Moq + TestServer (tests to be added later)                        |
 | Architecture          | Layered (Domain -> Application -> Infrastructure -> API) |
 | API Style             | RESTful with standard HTTP methods and status codes |
 | Documentation         | Swagger / OpenAPI                               |
@@ -162,7 +162,7 @@ Create the layered solution with all four projects, configure SQL Server connect
 
 - Create solution `PeopleCore.sln` with four projects: `PeopleCore.Domain`, `PeopleCore.Application`, `PeopleCore.Infrastructure`, `PeopleCore.Api`
 - Configure project references: Api -> Application -> Domain, Infrastructure -> Domain + Application
-- Add NuGet packages: EF Core SQL Server, ASP.NET Core OpenApi/Swagger, JWT authentication, FluentValidation, xUnit
+- Add NuGet packages: EF Core SQL Server, ASP.NET Core OpenApi/Swagger, JWT authentication, FluentValidation
 - Create `PeopleCore.Infrastructure/Data/HrisDbContext` with SQL Server connection string in `appsettings.json`
 - Set up `Program.cs` with dependency injection for all layers, Swagger, and CORS
 - Create common base classes in `PeopleCore.Domain/Common/` (BaseEntity with Id, CreatedAt, UpdatedAt)
@@ -183,7 +183,6 @@ Add JWT-based authentication with ASP.NET Identity and role-based authorization 
 - Configure JWT bearer authentication in `Program.cs`
 - Add authorization policies for Admin, HR, and Employee roles
 - Create FluentValidation validators for auth DTOs
-- Add unit tests for `AuthService` and integration tests for `AuthController`
 - Verify login flow returns valid JWT token and protected endpoints work
 
 ### Stage 3: Implement Departments & Positions module
@@ -199,7 +198,6 @@ Build the organizational structure management with departments (including hierar
 - Add FluentValidation validators (department code uniqueness, circular hierarchy prevention)
 - Add EF Core configurations for relationships and indexes
 - Add EF Core migration for new tables
-- Add unit tests for service and integration tests for controllers
 - Verify API endpoints via Swagger
 
 ### Stage 4: Implement Employee Management module
@@ -214,7 +212,6 @@ Build employee CRUD with personal info, employment details, and organizational a
 - Add FluentValidation validators (email uniqueness, date validation, required fields)
 - Add business rules: cannot delete active employee, must assign valid department/position
 - Add EF Core migration and seed sample employees
-- Add unit tests for service and integration tests for controllers
 - Verify API endpoints and filtering work correctly
 
 ### Stage 5: Implement Leave Management module
@@ -230,7 +227,6 @@ Build leave request workflow with leave types, approval process, and balance tra
 - Add authorization: only HR and Admin can approve/reject, employees can only see their own
 - Add FluentValidation validators (date ranges, leave type existence)
 - Add EF Core migration and seed leave types
-- Add unit tests for service (overlap detection, balance calculation) and integration tests
 - Verify approval workflow and authorization work correctly
 
 ### Stage 6: Implement Attendance & Time Tracking module
@@ -246,7 +242,6 @@ Build attendance tracking with clock-in/out, work hours calculation, and overtim
 - Add FluentValidation validators (date validation, time format)
 - Add business rules: cannot clock out before clock-in, cannot clock in twice on same day
 - Add EF Core migration
-- Add unit tests for service (time calculations, edge cases) and integration tests
 - Verify clock-in/out flow and authorization work correctly
 
 ### Stage 7: Implement Payroll Basics module
@@ -263,21 +258,15 @@ Build basic payroll processing with salary components, pay runs, and deduction c
 - Add FluentValidation validators (amount validation, period validation)
 - Add business rules: cannot process overlapping pay periods, must have salary components
 - Add EF Core migration and seed sample salary components
-- Add unit tests for service (pay calculations) and integration tests
 - Verify payroll calculation and processing workflow work correctly
 
-### Stage 8: Finalize with testing and documentation
-Add comprehensive tests across all modules, polish the API, and verify the complete system works end-to-end.
+### Stage 8: Finalize with documentation and verification
+Polish the API, add seed data, and verify the complete system works end-to-end.
 
-- Add integration tests for all controller endpoints across all modules
-- Add unit tests for all service business logic (edge cases, validation rules)
-- Add validator tests for FluentValidation rules
-- Create test helpers: `IntegrationTestBase` with TestServer, `TestFactory` with in-memory database
 - Add seed data for all entities (departments, positions, employees, leave types, salary components)
 - Configure Swagger with JWT authentication support
 - Add API documentation comments to controllers
 - Verify all migrations apply cleanly and database schema is correct
-- Run full test suite and verify all tests pass
 - Verify end-to-end flow: register -> login -> create department -> create employee -> submit leave -> approve -> clock in -> generate payroll
 - Final build and verification that the solution compiles and runs without errors
 
@@ -304,8 +293,9 @@ Add comprehensive tests across all modules, polish the API, and verify the compl
 
 ---
 
-## Testing Strategy
+## Testing (To Be Covered Later)
 
+The `PeopleCore.Tests/` project is reserved for future test implementation. It will include:
 - **Unit Tests**: Service methods with mocked repositories (xUnit + Moq)
 - **Integration Tests**: Full request pipeline with TestServer and test database
 - **Test Coverage**: Focus on business logic (services) and API endpoints (controllers)

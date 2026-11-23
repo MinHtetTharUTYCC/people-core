@@ -1,0 +1,26 @@
+root = true
+
+[*.cs]
+# Suppress Rider/ReSharper inspections that falsely flag EF Core entities and DTOs
+# EF Core requires { get; set; } for change tracking and lazy loading
+# Model binding requires { get; set; } for API request DTOs
+
+# "Property can be made init-only"
+resharper_property_can_be_made_init_only_global_highlighting = Do not show
+resharper_property_can_be_made_init_only_local_highlighting = Do not show
+
+# "Auto-property can be made get-only"
+resharper_auto_property_can_be_made_get_only_global_highlighting = Do not show
+resharper_auto_property_can_be_made_get_only_local_highlighting = Do not show
+
+# "Field can be made readonly"
+resharper_field_can_be_made_read_only_global_highlighting = Do not show
+resharper_field_can_be_made_read_only_local_highlighting = Do not show
+
+# "Auto-property accessor 'X.set' is never used" / "Auto-property accessor 'X.get' is never used"
+# DTO properties are defined before service implementations consume them
+resharper_auto_property_accessor_is_never_used_highlighting = Do not show
+
+# "Class has virtual members but no inheritors"
+# EF Core creates runtime proxy subclasses for lazy loading; static analysis can't see them
+resharper_class_with_virtual_members_but_no_inheritors_highlighting = Do not show

@@ -1,0 +1,22 @@
+## User secrets
+appsettings.Development.json
+appsettings.Production.json
+
+## Build artifacts
+bin/
+obj/
+*.user
+*.suo
+*.cache
+
+## IDE
+.vs/
+.idea/
+
+## Windows
+*.dll
+*.exe
+*.pdb
+*.log
+Thumbs.db
+desktop.ini
