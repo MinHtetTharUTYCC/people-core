@@ -53,6 +53,12 @@ public class AttendanceService(DbContext context) : IAttendanceService
         return ApiResponse<IEnumerable<AttendanceResponse>>.Ok(records.Select(MapResponse));
     }
 
+    public async Task<int?> GetEmployeeByEmailAsync(string email)
+    {
+        var employee = await context.Employees.FirstOrDefaultAsync(e => e.Email == email);
+        return employee?.Id;
+    }
+
     private static AttendanceResponse MapResponse(AttendanceRecord a) => new()
     {
         Id = a.Id, EmployeeId = a.EmployeeId, Date = a.Date, ClockIn = a.ClockIn,

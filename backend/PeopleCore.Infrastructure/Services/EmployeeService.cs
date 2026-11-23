@@ -99,7 +99,14 @@ public class EmployeeService(DbContext context) : IEmployeeService
         employee.HireDate = request.HireDate;
         employee.DepartmentId = request.DepartmentId;
         employee.PositionId = request.PositionId;
-        if (request.Status != null) employee.Status = (EmployeeStatus)Enum.Parse(typeof(EmployeeStatus), request.Status);
+        if (request.Status != null)
+        {
+            if (!Enum.TryParse<EmployeeStatus>(request.Status, ignoreCase: true, out var status))
+            {
+                return ApiResponse<EmployeeResponse>.Error("Invalid employee status");
+            }
+            employee.Status = status;
+        }
         employee.UpdatedAt = DateTime.UtcNow;
 
         await context.SaveChangesAsync();
@@ -130,9 +137,9 @@ public class EmployeeService(DbContext context) : IEmployeeService
         DateOfBirth = e.DateOfBirth,
         HireDate = e.HireDate,
         DepartmentId = e.DepartmentId,
-        DepartmentName = e.Department.Name,
+        DepartmentName = e.Department?.Name ?? "",
         PositionId = e.PositionId,
-        PositionTitle = e.Position.Title,
+        PositionTitle = e.Position?.Title ?? "",
         Status = e.Status.ToString()
     };
 }

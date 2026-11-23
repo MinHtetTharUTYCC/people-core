@@ -36,12 +36,36 @@ public class LeaveController(ILeaveService leaveService) : ControllerBase
     }
 
     [HttpGet("employee/{employeeId}")]
-    public async Task<IActionResult> GetByEmployee(int employeeId) => Ok(await leaveService.GetByEmployeeAsync(employeeId));
+    public async Task<IActionResult> GetByEmployee(int employeeId)
+    {
+        if (User.IsInRole("HR") == false && User.IsInRole("Admin") == false)
+        {
+            var currentUserEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            var employee = await leaveService.GetEmployeeByEmailAsync(currentUserEmail ?? "");
+            if (employee == null || employee.Value != employeeId)
+            {
+                return Forbid();
+            }
+        }
+        return Ok(await leaveService.GetByEmployeeAsync(employeeId));
+    }
 
     [HttpGet("pending")]
     [Authorize(Policy = "HROnly")]
     public async Task<IActionResult> GetPending() => Ok(await leaveService.GetPendingAsync());
 
     [HttpGet("balance/{employeeId}")]
-    public async Task<IActionResult> GetBalance(int employeeId) => Ok(await leaveService.GetBalanceAsync(employeeId));
+    public async Task<IActionResult> GetBalance(int employeeId)
+    {
+        if (User.IsInRole("HR") == false && User.IsInRole("Admin") == false)
+        {
+            var currentUserEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            var employee = await leaveService.GetEmployeeByEmailAsync(currentUserEmail ?? "");
+            if (employee == null || employee.Value != employeeId)
+            {
+                return Forbid();
+            }
+        }
+        return Ok(await leaveService.GetBalanceAsync(employeeId));
+    }
 }

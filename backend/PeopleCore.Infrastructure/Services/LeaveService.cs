@@ -113,11 +113,17 @@ public class LeaveService(DbContext context) : ILeaveService
         return ApiResponse<LeaveBalanceResponse>.Ok(balance);
     }
 
+    public async Task<int?> GetEmployeeByEmailAsync(string email)
+    {
+        var employee = await context.Employees.FirstOrDefaultAsync(e => e.Email == email);
+        return employee?.Id;
+    }
+
     private static LeaveRequestResponse MapResponse(LeaveRequest lr) => new()
     {
         Id = lr.Id, EmployeeId = lr.EmployeeId,
-        EmployeeName = $"{lr.Employee.FirstName} {lr.Employee.LastName}",
-        LeaveTypeId = lr.LeaveTypeId, LeaveTypeName = lr.LeaveType.Name,
+        EmployeeName = lr.Employee != null ? $"{lr.Employee.FirstName} {lr.Employee.LastName}" : "Unknown",
+        LeaveTypeId = lr.LeaveTypeId, LeaveTypeName = lr.LeaveType?.Name ?? "Unknown",
         StartDate = lr.StartDate, EndDate = lr.EndDate, Reason = lr.Reason,
         Status = lr.Status.ToString(), ApprovedBy = lr.ApprovedBy, ApprovedAt = lr.ApprovedAt
     };

@@ -65,13 +65,9 @@ public class AuthService(
             return ApiResponse<AuthResponse>.Error("Registration failed", errors);
         }
 
-        // Assign role
-        var role = request.Role ?? "Employee";
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
-        await userManager.AddToRoleAsync(user, role);
+        // Only allow Employee role for self-registration
+        const string allowedRole = "Employee";
+        await userManager.AddToRoleAsync(user, allowedRole);
 
         var roles = await userManager.GetRolesAsync(user);
         var token = jwtTokenService.GenerateToken(user.Id, user.Email!, roles);

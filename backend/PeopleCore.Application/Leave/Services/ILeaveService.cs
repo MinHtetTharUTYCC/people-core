@@ -11,4 +11,5 @@ public interface ILeaveService
     Task<ApiResponse<IEnumerable<LeaveRequestResponse>>> GetByEmployeeAsync(int employeeId);
     Task<ApiResponse<IEnumerable<LeaveRequestResponse>>> GetPendingAsync();
     Task<ApiResponse<LeaveBalanceResponse>> GetBalanceAsync(int employeeId);
+    Task<int?> GetEmployeeByEmailAsync(string email);
 }

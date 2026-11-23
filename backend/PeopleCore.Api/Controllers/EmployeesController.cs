@@ -16,6 +16,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         => Ok(await employeeService.GetAllAsync(page, pageSize, search, departmentId));
 
     [HttpGet("{id}")]
+    [Authorize(Policy = "HROnly")]
     public async Task<IActionResult> GetById(int id) => Ok(await employeeService.GetByIdAsync(id));
 
     [HttpPost]

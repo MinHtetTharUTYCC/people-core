@@ -23,7 +23,11 @@ public class PayrollService(DbContext context) : IPayrollService
         if (!await context.Employees.AnyAsync(e => e.Id == request.EmployeeId))
             return ApiResponse<SalaryComponentResponse>.Error("Employee not found");
 
-        var type = (SalaryType)Enum.Parse(typeof(SalaryType), request.Type);
+        if (!Enum.TryParse<SalaryType>(request.Type, ignoreCase: true, out var type))
+        {
+            return ApiResponse<SalaryComponentResponse>.Error("Invalid salary type");
+        }
+
         var component = new SalaryComponent
         {
             EmployeeId = request.EmployeeId,

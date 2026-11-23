@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using System.Text.Json;
 
 namespace PeopleCore.Api.Middleware;
@@ -9,11 +10,13 @@ public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+    private readonly IHostEnvironment _env;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger, IHostEnvironment env)
     {
         _next = next;
         _logger = logger;
+        _env = env;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -29,13 +32,16 @@ public class ExceptionHandlingMiddleware
         }
     }
 
-    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        var isDevelopment = _env.IsDevelopment();
+        var errorMessage = isDevelopment ? exception.Message : "An unexpected error occurred.";
+
         var response = new
         {
             success = false,
             message = "An unexpected error occurred.",
-            errors = new[] { new { field = "General", message = exception.Message } }
+            errors = new[] { new { field = "General", message = errorMessage } }
         };
 
         context.Response.ContentType = "application/json";
@@ -48,7 +54,7 @@ public class ExceptionHandlingMiddleware
                 {
                     success = false,
                     message = "Resource not found.",
-                    errors = new[] { new { field = "General", message = exception.Message } }
+                    errors = new[] { new { field = "General", message = errorMessage } }
                 };
                 break;
             case ArgumentException:
@@ -57,7 +63,7 @@ public class ExceptionHandlingMiddleware
                 {
                     success = false,
                     message = "Invalid argument.",
-                    errors = new[] { new { field = "General", message = exception.Message } }
+                    errors = new[] { new { field = "General", message = errorMessage } }
                 };
                 break;
             default:
