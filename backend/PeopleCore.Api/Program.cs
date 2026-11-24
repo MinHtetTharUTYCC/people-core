@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -82,10 +83,11 @@ builder.Services.AddOpenApi();
 
 // FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<ApiResponse<object>>();
+builder.Services.AddFluentValidationAutoValidation();
 
 // CORS
 builder.Services.AddCors(options =>
-{
+{   
     options.AddPolicy("AllowFrontend", policy =>
         policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
               .AllowAnyMethod()

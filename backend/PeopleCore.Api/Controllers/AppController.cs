@@ -6,7 +6,7 @@ namespace PeopleCore.Api.Controllers;
 [Route("api/[controller]")]
 public class AppController : ControllerBase
 {
-    [HttpGet("")]
+    [HttpGet()]
     public IActionResult Get()
     {
         return Ok(new
