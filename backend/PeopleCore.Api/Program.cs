@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PeopleCore.Api.Middleware;
+using PeopleCore.Api.Services;
 using PeopleCore.Application.Attendance.Services;
 using PeopleCore.Application.Common;
 using PeopleCore.Application.Departments.Services;
@@ -36,6 +37,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<DbContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 // Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");

@@ -1,12 +1,13 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using PeopleCore.Application.Identity.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace PeopleCore.Infrastructure.Security;
 
-public class JwtTokenService : PeopleCore.Application.Identity.Services.IJwtTokenService
+public class JwtTokenService : IJwtTokenService
 {
     private readonly string _secretKey;
     private readonly string _issuer;
@@ -22,14 +23,20 @@ public class JwtTokenService : PeopleCore.Application.Identity.Services.IJwtToke
         _expirationMinutes = jwt.GetValue<int?>("ExpirationMinutes") ?? 60;
     }
 
-    public string GenerateToken(string userId, string email, IEnumerable<string> roles)
+    public string GenerateToken(string userId, string email, IEnumerable<string> roles, int? employeeId)
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, userId),
-            new(ClaimTypes.Email, email),
+            new(JwtRegisteredClaimNames.Sub, userId),
+            new(ClaimTypes.NameIdentifier,userId),
+            new(ClaimTypes.Email,email),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        if (employeeId.HasValue)
+        {
+            claims.Add(new Claim("employee_id", employeeId.Value.ToString()));
+        }
 
         foreach (var role in roles)
         {

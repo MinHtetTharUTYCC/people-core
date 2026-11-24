@@ -2,17 +2,29 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PeopleCore.Application.Leave.DTOs;
 using PeopleCore.Application.Leave.Services;
+using PeopleCore.Application.Identity.Services;
 
 namespace PeopleCore.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Policy = "EmployeeOnly")]
-public class LeaveController(ILeaveService leaveService) : ControllerBase
+public class LeaveController(
+    ILeaveService leaveService,
+    ICurrentUserService currentUser) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Submit([FromBody] CreateLeaveRequest request)
     {
+        if (!User.IsInRole("HR") && !User.IsInRole("Admin"))
+        {
+            var employeeId = currentUser.EmployeeId;
+            if (employeeId == null)
+                return Unauthorized(new { success = false, message = "Employee not found for current user" });
+
+            request.EmployeeId = employeeId.Value;
+        }
+
         var result = await leaveService.SubmitAsync(request);
         return result.Success ? CreatedAtAction(nameof(GetByEmployee), new { employeeId = request.EmployeeId }, result) : BadRequest(result);
     }
@@ -40,9 +52,8 @@ public class LeaveController(ILeaveService leaveService) : ControllerBase
     {
         if (User.IsInRole("HR") == false && User.IsInRole("Admin") == false)
         {
-            var currentUserEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-            var employee = await leaveService.GetEmployeeByEmailAsync(currentUserEmail ?? "");
-            if (employee == null || employee.Value != employeeId)
+            var currentEmployeeId = currentUser.EmployeeId;
+            if (currentEmployeeId == null || currentEmployeeId.Value != employeeId)
             {
                 return Forbid();
             }
@@ -59,13 +70,13 @@ public class LeaveController(ILeaveService leaveService) : ControllerBase
     {
         if (User.IsInRole("HR") == false && User.IsInRole("Admin") == false)
         {
-            var currentUserEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-            var employee = await leaveService.GetEmployeeByEmailAsync(currentUserEmail ?? "");
-            if (employee == null || employee.Value != employeeId)
+            var currentEmployeeId = currentUser.EmployeeId;
+            if (currentEmployeeId == null || currentEmployeeId.Value != employeeId)
             {
                 return Forbid();
             }
         }
         return Ok(await leaveService.GetBalanceAsync(employeeId));
     }
+
 }

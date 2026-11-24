@@ -3,7 +3,6 @@ using PeopleCore.Application.Common;
 using PeopleCore.Application.Departments.DTOs;
 using PeopleCore.Application.Departments.Services;
 using PeopleCore.Domain.Departments;
-using PeopleCore.Infrastructure.Data;
 using DbContext = PeopleCore.Infrastructure.Data.DbContext;
 
 namespace PeopleCore.Infrastructure.Services;

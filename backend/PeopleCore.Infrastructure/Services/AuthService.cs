@@ -3,13 +3,15 @@ using PeopleCore.Application.Common;
 using PeopleCore.Application.Identity.DTOs;
 using PeopleCore.Application.Identity.Services;
 using PeopleCore.Domain.Identity;
+using Microsoft.EntityFrameworkCore;
+using HrisDbContext = PeopleCore.Infrastructure.Data.DbContext;
 
 namespace PeopleCore.Infrastructure.Services;
 
 public class AuthService(
     UserManager<ApplicationUser> userManager,
     IJwtTokenService jwtTokenService,
-    RoleManager<IdentityRole> roleManager)
+    HrisDbContext context)
     : IAuthService
 {
     public async Task<ApiResponse<AuthResponse>> LoginAsync(LoginRequest request)
@@ -27,7 +29,11 @@ public class AuthService(
         }
 
         var roles = await userManager.GetRolesAsync(user);
-        var token = jwtTokenService.GenerateToken(user.Id, user.Email!, roles);
+        var employeeId = await context.Employees
+            .Where(e => e.Email == user.Email)
+            .Select(e => (int?)e.Id)
+            .FirstOrDefaultAsync();
+        var token = jwtTokenService.GenerateToken(user.Id, user.Email!, roles, employeeId);
 
         return ApiResponse<AuthResponse>.Ok(new AuthResponse
         {
@@ -70,7 +76,11 @@ public class AuthService(
         await userManager.AddToRoleAsync(user, allowedRole);
 
         var roles = await userManager.GetRolesAsync(user);
-        var token = jwtTokenService.GenerateToken(user.Id, user.Email!, roles);
+        var employeeId = await context.Employees
+            .Where(e => e.Email == user.Email)
+            .Select(e => (int?)e.Id)
+            .FirstOrDefaultAsync();
+        var token = jwtTokenService.GenerateToken(user.Id, user.Email!, roles, employeeId);
 
         return ApiResponse<AuthResponse>.Ok(new AuthResponse
         {
