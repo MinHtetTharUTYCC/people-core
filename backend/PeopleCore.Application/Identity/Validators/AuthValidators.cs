@@ -41,7 +41,8 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
             .Must(p => p.Any(c => !char.IsLetterOrDigit(c))).WithMessage("Password must contain a special character");
 
         RuleFor(x => x.Role)
-            .Must(role => role == null || new[] { "Admin", "HR", "Employee" }.Contains(role))
-            .WithMessage("Role must be Admin, HR, or Employee");
+            .NotEmpty().WithMessage("Role is required")
+            .Must(role => role == RoleConstants.Employee)
+            .WithMessage("Only Employee role is allowed for self-registration");
     }
 }

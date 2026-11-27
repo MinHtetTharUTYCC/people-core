@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PeopleCore.Application.Identity;
 using PeopleCore.Application.Leave.DTOs;
 using PeopleCore.Application.Leave.Services;
 using PeopleCore.Application.Identity.Services;
@@ -16,7 +17,7 @@ public class LeaveController(
     [HttpPost]
     public async Task<IActionResult> Submit([FromBody] CreateLeaveRequest request)
     {
-        if (!User.IsInRole("HR") && !User.IsInRole("Admin"))
+        if (!User.IsInRole(RoleConstants.HR) && !User.IsInRole(RoleConstants.Admin))
         {
             var employeeId = currentUser.EmployeeId;
             if (employeeId == null)
@@ -50,7 +51,7 @@ public class LeaveController(
     [HttpGet("employee/{employeeId}")]
     public async Task<IActionResult> GetByEmployee(int employeeId)
     {
-        if (User.IsInRole("HR") == false && User.IsInRole("Admin") == false)
+        if (User.IsInRole(RoleConstants.HR) == false && User.IsInRole(RoleConstants.Admin) == false)
         {
             var currentEmployeeId = currentUser.EmployeeId;
             if (currentEmployeeId == null || currentEmployeeId.Value != employeeId)
@@ -68,7 +69,7 @@ public class LeaveController(
     [HttpGet("balance/{employeeId}")]
     public async Task<IActionResult> GetBalance(int employeeId)
     {
-        if (User.IsInRole("HR") == false && User.IsInRole("Admin") == false)
+        if (User.IsInRole(RoleConstants.HR) == false && User.IsInRole(RoleConstants.Admin) == false)
         {
             var currentEmployeeId = currentUser.EmployeeId;
             if (currentEmployeeId == null || currentEmployeeId.Value != employeeId)

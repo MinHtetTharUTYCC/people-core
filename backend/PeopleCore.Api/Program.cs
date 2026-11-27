@@ -10,10 +10,12 @@ using PeopleCore.Application.Attendance.Services;
 using PeopleCore.Application.Common;
 using PeopleCore.Application.Departments.Services;
 using PeopleCore.Application.Employees.Services;
+using PeopleCore.Application.Identity;
 using PeopleCore.Application.Identity.Services;
 using PeopleCore.Application.Leave.Services;
 using PeopleCore.Application.Payroll.Services;
 using PeopleCore.Domain.Identity;
+using PeopleCore.Infrastructure.Data;
 using PeopleCore.Infrastructure.Security;
 using PeopleCore.Infrastructure.Services;
 using System.Text;
@@ -69,9 +71,9 @@ builder.Services.AddAuthentication(options =>
 // Authorization policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("HROnly", policy => policy.RequireRole("Admin", "HR"));
-    options.AddPolicy("EmployeeOnly", policy => policy.RequireRole("Admin", "HR", "Employee"));
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole(RoleConstants.Admin));
+    options.AddPolicy("HROnly", policy => policy.RequireRole(RoleConstants.Admin, RoleConstants.HR));
+    options.AddPolicy("EmployeeOnly", policy => policy.RequireRole(RoleConstants.Admin, RoleConstants.HR, RoleConstants.Employee));
 });
 
 // Controllers
@@ -132,6 +134,9 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DbContext>();
     db.Database.Migrate();
+
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await SeedData.SeedRolesAsync(roleManager);
 }
 
 app.Run();

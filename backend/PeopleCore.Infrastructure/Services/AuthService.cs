@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using PeopleCore.Application.Common;
+using PeopleCore.Application.Identity;
 using PeopleCore.Application.Identity.DTOs;
 using PeopleCore.Application.Identity.Services;
 using PeopleCore.Domain.Identity;
@@ -45,6 +46,11 @@ public class AuthService(
 
     public async Task<ApiResponse<AuthResponse>> RegisterAsync(RegisterRequest request)
     {
+        if (!string.Equals(request.Role, RoleConstants.Employee, StringComparison.OrdinalIgnoreCase))
+        {
+            return ApiResponse<AuthResponse>.Error("Only Employee role is allowed for self-registration");
+        }
+
         var existingUser = await userManager.FindByEmailAsync(request.Email);
         if (existingUser != null)
         {
@@ -71,9 +77,7 @@ public class AuthService(
             return ApiResponse<AuthResponse>.Error("Registration failed", errors);
         }
 
-        // Only allow Employee role for self-registration
-        const string allowedRole = "Employee";
-        await userManager.AddToRoleAsync(user, allowedRole);
+        await userManager.AddToRoleAsync(user, RoleConstants.Employee);
 
         var roles = await userManager.GetRolesAsync(user);
         var employeeId = await context.Employees
